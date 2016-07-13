@@ -11,10 +11,10 @@ exports.up = function(knex, Promise) {
     //USER has users_time aggregate of time in app (?) || remainder.
 
     knex.schema.createTable('users', function(table) {
-      table.increments('users_id').primary();
+      table.increments('user_id').primary();
       table.string('username');
       table.string('password');
-      table.integer('users_time');
+      table.integer('user_time');
     }),
 
     //PROJECTS table: actual_time vs estimated_time; one user many projects; one proj one est/act time
@@ -23,23 +23,23 @@ exports.up = function(knex, Promise) {
     //To Do: customizable skill as oppposed to three skills
 
      knex.schema.createTable('projects', function(table) {
-      table.increments('projects_id').primary();
+      table.increments('project_id').primary();
       table.string('project_name');
       table.integer('est_time');
       table.string('skill1');
       table.string('skill2');
       table.string('skill3');
       table.boolean('done');
-      table.integer('users_id')
-                  .references('users_id')
+      table.integer('user_id')
+                  .references('user_id')
                   .inTable('users');
     }),
 
     //SKILLS table
 
     knex.schema.createTable('skills', function(table) {
-      table.increments('skills_id').primary();
-      table.string('skills_name');
+      table.increments('skill_id').primary();
+      table.string('skill_name');
     }),
 
     //SKILL TIMES: join table many skills many projects; one user many skills; one skill one est/act time
@@ -49,14 +49,14 @@ exports.up = function(knex, Promise) {
     knex.schema.createTable('skill_times', function(table) {
       table.increments('skill_times_id').primary();
       table.float('act_time');
-      table.integer('users_id')
-                  .references('users_id')
+      table.integer('user_id')
+                  .references('user_id')
                   .inTable('users');
-      table.integer('projects_id')
-                  .references('projects_id')
+      table.integer('project_id')
+                  .references('project_id')
                   .inTable('projects');
-      table.integer('skills_id')
-                  .references('skills_id')
+      table.integer('skill_id')
+                  .references('skill_id')
                   .inTable('skills');
     })
 

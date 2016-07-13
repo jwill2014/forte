@@ -7,7 +7,7 @@ var Projects = module.exports = {
   getAllProjects: function(userId) {
     return db.select()
       .from('projects')
-      .where('users_id', '=', userId)
+      .where('user_id', '=', userId)
       .then(function(rows) {
         return rows;
       });
@@ -16,7 +16,7 @@ var Projects = module.exports = {
   getActiveProjects: function(userId) {
     return db.select()
       .from('projects')
-      .where('users_id', userId)
+      .where('user_id', userId)
       .andWhere('done', null)
       .then(function(rows) {
         return Skills.getSkillTime(rows)
@@ -35,10 +35,10 @@ var Projects = module.exports = {
 
   insertProject: function(userId, project) {
     //need req.body.project to be an object with the following format:  { name:, est:, skills: {skillname: 0, skillname2: 0, etc.}}
-    return db('projects').returning("projects_id").insert({
+    return db('projects').returning('project_id').insert({
         project_name: project.name, 
         est_time: project.estTime, 
-        users_id: userId,
+        user_id: userId,
         skill1: project.skill1,
         skill2: project.skill2, 
         skill3: project.skill3})
@@ -52,7 +52,7 @@ var Projects = module.exports = {
   },
 
   updateProject: function(project){
-    return db('projects').where('projects_id', project.projects_id)
+    return db('projects').where('project_id', project.project_id)
       .update({done: true})
       .then(function(){
         console.log(project.project_name + " update complete")
@@ -62,7 +62,7 @@ var Projects = module.exports = {
   duplicateProject: function(userId, project) {
     return db.select()
       .from('projects')
-      .where('users_id', userId)
+      .where('user_id', userId)
       .andWhere('project_name', project.name)
       .then(function(projects) {
         return projects.length > 0;
@@ -73,9 +73,9 @@ var Projects = module.exports = {
    return db.select()
      .from('projects')
      .where('project_name', '=', project)
-     .andWhere('users_id', '=', userId)
+     .andWhere('user_id', '=', userId)
      .then(function(result) {
-       return result[0].projects_id;
+       return result[0].project_id;
      })
   },
 

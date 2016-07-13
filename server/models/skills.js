@@ -14,10 +14,10 @@ var Skills = module.exports = {
   // getProjectSkills: function(projId) {
   //   return db.select()
   //     .from('skill_times')
-  //     .where('projects_id', projId)
+  //     .where('project_id', projId)
   //     .then(function(rows) {
   //       for(var row in rows) {
-  //         row.skill_name = this.getSkillName(row.skills_id);
+  //         row.skill_name = this.getSkillName(row.skill_id);
   //       }
   //       return rows;
   //     })
@@ -29,9 +29,9 @@ var Skills = module.exports = {
   // getSkillName: function(skillId) {
   //   return db.select()
   //     .from('skills')
-  //     .where('skills_id', '=', skillId)
+  //     .where('skill_id', '=', skillId)
   //     .then(function(rows) {
-  //       return rows[0].skills_name;
+  //       return rows[0].skill_name;
   //     })
   // },
 
@@ -40,10 +40,10 @@ var Skills = module.exports = {
   findSkill: function(skillName) {
     return db.select()
       .from('skills')
-      .where('skills_name', skillName)
+      .where('skill_name', skillName)
       .then(function(result) {
         if(result.length) {
-          return result[0].skills_id
+          return result[0].skill_id
         } else {
           return false;
         }
@@ -58,15 +58,15 @@ var Skills = module.exports = {
       var skills = ['skill1', 'skill2', 'skill3'];
         var skillsPromises = skills.map(function(skill){
           if (project[skill]) {
-            return db.select('skills_id')
+            return db.select('skill_id')
                      .from('skills')
-                     .where('skills_name', project[skill])
+                     .where('skill_name', project[skill])
                      .then(function (skillId) {
-                       skillId = skillId[0].skills_id;
+                       skillId = skillId[0].skill_id;
                        return  db.select()
                                  .from('skill_times')
-                                 .where('projects_id', project.projects_id)
-                                 .andWhere('skills_id', skillId)
+                                 .where('project_id', project.project_id)
+                                 .andWhere('skill_id', skillId)
                                  .then(function (skillTimes) {
                                   var time = 0;
                                   for (var i = 0; i < skillTimes.length; i ++) {
@@ -100,7 +100,7 @@ var Skills = module.exports = {
       return Skills.findSkill(skill)
         .then(function(skillId){
           if (!skillId) {
-            return db('skills').returning("skills_name").insert({ skills_name: skill })
+            return db('skills').returning("skill_name").insert({ skill_name: skill })
               .then(function(name) {
                 return true;
               });
@@ -116,7 +116,7 @@ var Skills = module.exports = {
     time = Math.round(time * 3600);
       return this.findSkill(skillName)
                  .then(function (skillId) {
-                  db('skill_times').select().where('projects_id', '=', projectId).andWhere('skills_id', '=', skillId)
+                  db('skill_times').select().where('project_id', '=', projectId).andWhere('skill_id', '=', skillId)
                   .then(function (results) {
                     return results[0];
                   })
@@ -124,21 +124,21 @@ var Skills = module.exports = {
                     if(!exists) {
                       return db('skill_times')
                                .insert({
-                                projects_id: projectId,
+                                project_id: projectId,
                                 act_time: 0,
-                                users_id: userId,
-                                skills_id: skillId
+                                user_id: userId,
+                                skill_id: skillId
                                })
                       .then(function() {
                       return db('skill_times')
-                              .where('projects_id', '=', projectId)
-                              .andWhere('skills_id', '=', skillId)
+                              .where('project_id', '=', projectId)
+                              .andWhere('skill_id', '=', skillId)
                               .increment('act_time', time);
                       })
                     } else {
                       return db('skill_times')
-                                .where('projects_id', '=', projectId)
-                                .andWhere('skills_id', '=', skillId)
+                                .where('project_id', '=', projectId)
+                                .andWhere('skill_id', '=', skillId)
                                 .increment('act_time', time);
                     }
                   })

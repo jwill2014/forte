@@ -1,6 +1,6 @@
 //initates DB connection
 
-var db = require('../db.js');
+var db = require('../db');
 
 //exports object: methods on users
 
@@ -11,16 +11,19 @@ module.exports = {
     return db.select().from('users')
             .where('username', username)
             .then(function(results) {
-      return results[0];
+              // console.log("results: ", results);
+              return results[0];
     })
   },
   //returns user_id property
 
   findUserId: function(username) {
     return db.select().from('users')
-             .where('username', username)
-             .then(function(result) {
-      return result[0].users_id;
+            .where('username', username)
+            .then(function(result) {
+              // console.log("results: ", result);
+              // console.log("result.user_id: ", result[0].user_id);
+              return result[0].user_id;
     })
   },
 

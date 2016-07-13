@@ -7,7 +7,7 @@ var express = require('express');
 var jwt = require('jwt-simple');
 var parse = require('body-parser');
 var bcrypt = require('bcrypt-nodejs');
-var db = require('database');
+var db = require('./db');
 var Utils = require('./lib/utils.js'); 
 /* Importing Models - all models are functions that interact with certain tables in the database */
 var Users = require('./models/users.js');
@@ -24,6 +24,8 @@ app.use(parse.json());
 /* This is used to direct '/' request to client, so Angular can handle it */
 app.use(express.static(__dirname + '/../client'));
 
+
+/* sign-in users that already exist */
 app.post('/users/signin', function(req, res, next) {
   var username = req.body.username;
   var password = req.body.password;
@@ -48,6 +50,7 @@ app.post('/users/signin', function(req, res, next) {
     });
 });
 
+/* sign-up new users */
 app.post('/users/signup', function(req, res, next) {
   var newUser = req.body.username;
   var newPass = req.body.password;
@@ -85,30 +88,14 @@ app.post('/projects/create', function(req, res, next) {
   //assuming that req.body.projects = { project: { name: <projectname> ,  est: <estimated_time>, skills: { skillname: 0, skillname: 0 ... }  }
   var username = jwt.decode(req.headers['x-access-token'], 'jmoney');
   var project = req.body;
-  //this is old code - you can refactor in a similar style to lines 107-111 to avoid callback hell
-  // Users.findUserId(username)
-  //   .then(function(userId) {
-  //     Projects.duplicateProject(userId, project)
-  //       .then(function(exist) {
-  //         if (exist) {
-  //           next(new Error('Project exists!'));
-  //         } else {
-  //           Projects.insertProject(userId, project)
-  //             .then(function() {
-  //               console.log('Insert project success!')
-  //               Projects.hasInProgress(userId)
-  //                 .then(function(hasWIP) {
-  //                   res.json({hasWIP: hasWIP});
-  //                 });
-  //             });
-  //         }
-  //       }); 
-  //     });
+  console.log("new project: ", project);
+
   Users.findUserId(username)
     .then(function(userId) {
-      return Projects.duplicateProject(userId, project)
+      // console.log("User ID Found: ", userId);
+      Projects.duplicateProject(userId, project);
     })
-    .then(function(exist) {
+    .then(function(userId, exist) {
       if (exist) {
         next(new Error('Project exists!'));
       } else {
